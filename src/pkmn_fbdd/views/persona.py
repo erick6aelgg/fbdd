@@ -77,7 +77,7 @@ def api_persona_delete(request):
     return JsonResponse({'id_persona': id_persona, 'deleted': True}, status=200)
 
 @csrf_exempt
-def api_personas(request):
+def api_persona(request):
     """List all Personas as JSON array."""
     if request.method != 'GET':
         return JsonResponse({'error': 'método incorrecto'}, status=405)
