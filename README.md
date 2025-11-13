@@ -110,14 +110,14 @@ docker exec -it postgres-container psql -U usuario -d midatabase
 
 ---
 
-## Endpoints de la API para `personas`
+## Endpoints de la API para `persona`
 
-| Método | Endpoint                | Qué hace                 | Ejemplo de payload                                                                                                                                                     |
-| ------ | ----------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/personas/`        | Lista todas las personas | —                                                                                                                                                                      |
-| POST   | `/api/personas/create/` | Crea una persona nueva   | `json { "nombres": "Juan", "apellido_paterno": "Pérez", "apellido_materno": "Gómez", "fecha_de_nacimiento": "1990-01-01", "espersonal": false, "esespectador": true }` |
-| PUT    | `/api/personas/update/` | Actualiza una persona    | `json { "id_persona": 1, "nombres": "Juan Carlos", "espersonal": true }`                                                                                               |
-| DELETE | `/api/personas/delete/` | Borra persona por ID     | `json { "id_persona": 1 }`                                                                                                                                             |
+| Método | Endpoint               | Qué hace                 | Ejemplo de payload                                                                                                                                                     |
+| ------ | ---------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/persona/`        | Lista todas las personas | —                                                                                                                                                                      |
+| POST   | `/api/persona/create/` | Crea una persona nueva   | `json { "nombres": "Juan", "apellido_paterno": "Pérez", "apellido_materno": "Gómez", "fecha_de_nacimiento": "1990-01-01", "espersonal": false, "esespectador": true }` |
+| PUT    | `/api/persona/update/` | Actualiza una persona    | `json { "id_persona": 1, "nombres": "Juan Carlos", "espersonal": true }`                                                                                               |
+| DELETE | `/api/persona/delete/` | Borra persona por ID     | `json { "id_persona": 1 }`                                                                                                                                             |
 
 ## Endpoints de la API para `personal`
 

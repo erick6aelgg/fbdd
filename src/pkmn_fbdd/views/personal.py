@@ -4,7 +4,7 @@ import json
 
 from pkmn_fbdd.models import Personal, Persona
 from pkmn_fbdd.services.persona import list_personas
-from ..services.personal import create_personal, delete_personal, list_personal, update_personal
+from ..services.personal import create_personal, delete_personal, list_personal, update_personal, get_personal
 
 @csrf_exempt
 def api_personal_create(request):
@@ -125,4 +125,50 @@ def api_personal(request):
         return JsonResponse({'error': str(exc)}, status=400)
 
     return JsonResponse({'personal': result}, status=200)
+
+
+@csrf_exempt
+def api_personal_detail(request, id_persona):
+    if request.method == 'GET':
+        personal = get_personal(id_persona)
+        if not personal:
+            return JsonResponse({'error': 'no existe personal con ese id'}, status=404)
+
+        return JsonResponse({
+            'id_personal': personal.pk,
+            'persona': personal.persona.id_persona if personal.persona else None,
+            'esparticipante': personal.esparticipante,
+            'esorganizador': personal.esorganizador,
+        }, status=200)
+
+    if request.method in ('PUT', 'PATCH'):
+        try:
+            payload = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            return JsonResponse({'error': 'json inválido'}, status=400)
+
+        try:
+            personal = update_personal(id_persona, payload)
+        except Personal.DoesNotExist:
+            return JsonResponse({'error': 'no existe personal con ese id'}, status=404)
+        except Exception as exc:
+            return JsonResponse({'error': str(exc)}, status=400)
+
+        return JsonResponse({
+            'id_personal': personal.pk,
+            'esparticipante': personal.esparticipante,
+            'esorganizador': personal.esorganizador,
+        }, status=200)
+
+    if request.method == 'DELETE':
+        try:
+            delete_personal(id_persona)
+        except Personal.DoesNotExist:
+            return JsonResponse({'error': 'no existe personal con ese id'}, status=404)
+        except Exception as exc:
+            return JsonResponse({'error': str(exc)}, status=400)
+
+        return JsonResponse({'id_persona': id_persona, 'deleted': True}, status=200)
+
+    return JsonResponse({'error': 'método incorrecto'}, status=405)
 
