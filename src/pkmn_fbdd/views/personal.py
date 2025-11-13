@@ -37,7 +37,7 @@ def api_personal_create(request):
     personal.save()
 
     return JsonResponse({
-        'id_personal': personal.id_persona,
+    'id_personal': personal.pk,
         'persona': persona.id_persona,
         'esparticipante': personal.esparticipante,
         'esorganizador': personal.esorganizador
@@ -74,7 +74,7 @@ def api_personal_update(request):
         return JsonResponse({'error': str(exc)}, status=400)
 
     result = {
-        'id_persona': personal.id_persona,
+        'id_persona': personal.pk,
         'esparticipante': personal.esparticipante,
         'esorganizador': personal.esorganizador,
     }
@@ -115,11 +115,11 @@ def api_personal(request):
     try:
         personal = list_personal()
         result = []
-        for persona in personal:
+        for p in personal:
             result.append({
-                'id_personal': persona.id_personal,
-                'esparticipante': persona.esparticipante,
-                'esorganizador': persona.esorganizador,
+                'id_personal': p.pk,
+                'esparticipante': p.esparticipante,
+                'esorganizador': p.esorganizador,
             })
     except Exception as exc:
         return JsonResponse({'error': str(exc)}, status=400)

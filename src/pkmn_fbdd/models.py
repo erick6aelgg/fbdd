@@ -15,13 +15,20 @@ class Persona(models.Model):
         return str(self.id_persona) + " - " + self.nombres
     
 class Personal(models.Model):
-    id_persona = models.AutoField(primary_key=True)
-    # Link to Persona: map the field to the existing DB column name.
-    # If your DB column is 'persona' (not 'id_persona'), set db_column='persona' so Django uses the correct column.
-    persona = models.OneToOneField('pkmn_fbdd.Persona', on_delete=models.CASCADE, db_column='persona', related_name='personal')
+    # In the DB the table `personal` uses the column `id_persona` both as
+    # primary key and as FK to `persona(id_persona)`. Model this by making
+    # the OneToOneField the primary key and mapping it to db_column 'id_persona'.
+    persona = models.OneToOneField(
+        'pkmn_fbdd.Persona',
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='id_persona',
+        related_name='personal'
+    )
     esparticipante = models.BooleanField(default=False, blank=True)
     esorganizador = models.BooleanField(default=False, blank=True)
     class Meta:
         db_table = 'personal'
     def __str__(self):
-        return str(self.id_persona) + " - " + str(self.persona)
+        # `self.persona` es la relación; `self.pk` será el id_persona
+        return str(self.pk) + " - " + str(self.persona)
