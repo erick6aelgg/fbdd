@@ -118,3 +118,12 @@ docker exec -it postgres-container psql -U usuario -d midatabase
 | POST   | `/api/personas/create/` | Crea una persona nueva   | `json { "nombres": "Juan", "apellido_paterno": "Pérez", "apellido_materno": "Gómez", "fecha_de_nacimiento": "1990-01-01", "espersonal": false, "esespectador": true }` |
 | PUT    | `/api/personas/update/` | Actualiza una persona    | `json { "id_persona": 1, "nombres": "Juan Carlos", "espersonal": true }`                                                                                               |
 | DELETE | `/api/personas/delete/` | Borra persona por ID     | `json { "id_persona": 1 }`                                                                                                                                             |
+
+## Endpoints de la API para `personal`
+
+| Método | Endpoint                | Qué hace                          | Ejemplo de payload                                                           |
+| ------ | ----------------------- | --------------------------------- | ---------------------------------------------------------------------------- |
+| GET    | `/api/personal/`        | Lista todo el personal            | —                                                                            |
+| POST   | `/api/personal/create/` | Crea un registro de personal      | `json { "id_persona": 600, "esparticipante": true, "esorganizador": false }` |
+| PUT    | `/api/personal/update/` | Actualiza un registro de personal | `json { "id_persona": 600, "esparticipante": false, "esorganizador": true }` |
+| DELETE | `/api/personal/delete/` | Borra un registro por ID          | `json { "id_persona": 600 }`                                                 |
