@@ -155,3 +155,15 @@ def api_persona_detail(request, id_persona):
 
     return JsonResponse({'error': 'método incorrecto'}, status=405)
 
+from django.shortcuts import render
+
+def crear_persona_html(request):
+    # renderiza la plantilla que creamos: templates/pkmn_fbdd/crearPersona.html
+    return render(request, 'pkmn_fbdd/crearPersona.html')
+
+
+def update_persona_html(request, id_persona):
+    # renderiza la plantilla para actualizar una persona existente
+    # pasamos el id a la plantilla para que el JS haga el GET/PUT al endpoint REST
+    return render(request, 'pkmn_fbdd/updatePersona.html', {'id_persona': id_persona})
+

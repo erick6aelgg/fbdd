@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import persona as persona_views
 from .views import personal as personal_views
+from .views import persona as persona_views
 
 app_name = 'pkmn_fbdd'
 
@@ -18,4 +19,6 @@ urlpatterns = [
     path('api/personal/update/', personal_views.api_personal_update, name='api_personal_update'),
     path('api/personal/delete/', personal_views.api_personal_delete, name='api_personal_delete'),
     path('api/personal/<int:id_persona>/', personal_views.api_personal_detail, name='api_personal_detail'),
+    path('crear-persona/', persona_views.crear_persona_html, name='crear_persona_html'),
+    path('actualizar-persona/<int:id_persona>/', persona_views.update_persona_html, name='update_persona_html'),
 ]

@@ -1,0 +1,126 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Actualizar Persona</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+</head>
+<body class="dark bg-gray-900 min-h-screen py-8 text-gray-100">
+  <div class="max-w-2xl mx-auto bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center justify-center">
+    <h1 class="text-2xl font-bold mb-6 text-gray-100 text-center">Actualizar Persona</h1>
+
+    <form id="persona-form" class="space-y-6 w-full">
+      <div class="flex flex-col items-center justify-center text-center">
+        <label class="block text-sm font-medium text-gray-300">Nombres</label>
+        <input id="nombres" name="nombres" required class="mt-2 block w-full rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2 text-center" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-col items-center justify-center text-center">
+          <label class="block text-sm font-medium text-gray-300">Apellido paterno</label>
+          <input id="apellido_paterno" name="apellido_paterno" required class="mt-2 block w-full rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2 text-center" />
+        </div>
+        <div class="flex flex-col items-center justify-center text-center">
+          <label class="block text-sm font-medium text-gray-300">Apellido materno</label>
+          <input id="apellido_materno" name="apellido_materno" class="mt-2 block w-full rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2 text-center" />
+        </div>
+      </div>
+
+      <div class="flex flex-col items-center justify-center text-center">
+        <label class="block text-sm font-medium text-gray-300">Fecha de nacimiento</label>
+        <input id="fecha_de_nacimiento" name="fecha_de_nacimiento" type="date" class="mt-2 block w-full rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2 text-center" />
+      </div>
+
+      <div class="flex items-center gap-6">
+        <label class="inline-flex items-center">
+          <input id="espersonal" type="checkbox" name="espersonal" class="h-4 w-4 text-indigo-400 bg-gray-700 border-gray-600" />
+          <span class="ml-2 text-sm text-gray-300">Es personal</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input id="esespectador" type="checkbox" name="esespectador" class="h-4 w-4 text-indigo-400 bg-gray-700 border-gray-600" />
+          <span class="ml-2 text-sm text-gray-300">Es espectador</span>
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <button id="submit-btn" type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Actualizar</button>
+        <a href="/" class="text-sm text-gray-300 hover:underline">Volver</a>
+      </div>
+    </form>
+
+    <div id="message" class="mt-4"></div>
+  </div>
+
+  <script>
+    // id_persona inyectado por la view
+    const ID_PERSONA = {{ id_persona }};
+    const form = document.getElementById('persona-form');
+    const msg = document.getElementById('message');
+
+    const elEsp = document.getElementById('espersonal');
+    const elEspc = document.getElementById('esespectador');
+    elEsp.addEventListener('change', () => { if (elEsp.checked) elEspc.checked = false; });
+    elEspc.addEventListener('change', () => { if (elEspc.checked) elEsp.checked = false; });
+
+    async function loadPersona(){
+      try{
+        const res = await fetch(`/api/persona/${ID_PERSONA}/`);
+        if (!res.ok) throw new Error('No se pudo obtener la persona');
+        const p = await res.json();
+        document.getElementById('nombres').value = p.nombres || '';
+        document.getElementById('apellido_paterno').value = p.apellido_paterno || '';
+        document.getElementById('apellido_materno').value = p.apellido_materno || '';
+        if (p.fecha_de_nacimiento) document.getElementById('fecha_de_nacimiento').value = p.fecha_de_nacimiento;
+        document.getElementById('espersonal').checked = !!p.espersonal;
+        document.getElementById('esespectador').checked = !!p.esespectador;
+      }catch(err){
+        msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error cargando persona: ${err.message}</div>`;
+      }
+    }
+
+    form.addEventListener('submit', async (e) =>{
+      e.preventDefault();
+      msg.innerHTML = '';
+
+      const espersonalChecked = form.elements['espersonal'].checked;
+      const esespectadorChecked = form.elements['esespectador'].checked;
+      if (!(espersonalChecked ^ esespectadorChecked)){
+        msg.innerHTML = `<div class="p-3 rounded bg-yellow-800 text-yellow-100">Seleccione exactamente una opción: "Es personal" o "Es espectador".</div>`;
+        return;
+      }
+
+      const payload = {
+        id_persona: ID_PERSONA,
+        nombres: document.getElementById('nombres').value,
+        apellido_paterno: document.getElementById('apellido_paterno').value,
+        apellido_materno: document.getElementById('apellido_materno').value,
+        fecha_de_nacimiento: document.getElementById('fecha_de_nacimiento').value || null,
+        espersonal: espersonalChecked,
+        esespectador: esespectadorChecked,
+      };
+
+      try{
+        const res = await fetch(`/api/persona/${ID_PERSONA}/`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const j = await res.json().catch(()=>({}));
+        if (res.ok){
+          msg.innerHTML = `<div class="p-3 rounded bg-green-800 text-green-100">Persona actualizada.</div>`;
+        } else {
+          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error: ${j.error || res.statusText}</div>`;
+        }
+      }catch(err){
+        msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error de red: ${err.message}</div>`;
+      }
+    });
+
+    // cargar datos al iniciar
+    loadPersona();
+  </script>
+</body>
+</html>
