@@ -158,17 +158,17 @@ def api_persona_detail(request, id_persona):
 from django.shortcuts import render
 
 def crear_persona_html(request):
-    # renderiza la plantilla que creamos: templates/pkmn_fbdd/crearPersona.html
-    return render(request, 'pkmn_fbdd/crearPersona.html')
+    # renderiza la plantilla que creamos: templates/pkmn_fbdd/crear_persona.html
+    return render(request, 'pkmn_fbdd/crear_persona.html')
 
 
 def update_persona_html(request, id_persona):
     # renderiza la plantilla para actualizar una persona existente
     # pasamos el id a la plantilla para que el JS haga el GET/PUT al endpoint REST
-    return render(request, 'pkmn_fbdd/updatePersona.html', {'id_persona': id_persona})
+    return render(request, 'pkmn_fbdd/update_persona.html', {'id_persona': id_persona})
 
 
 def delete_persona_html(request, id_persona):
     # renderiza la plantilla para eliminar una persona existente
-    return render(request, 'pkmn_fbdd/eliminarPersona.html', {'id_persona': id_persona})
+    return render(request, 'pkmn_fbdd/eliminar_persona.html', {'id_persona': id_persona})
 

@@ -180,7 +180,7 @@ def crear_personal_html(request):
     El template cargará la lista de Personas vía AJAX (/api/persona/) para
     poblar un selector y enviará POST a /api/personal/create/.
     """
-    return render(request, 'pkmn_fbdd/crearPersonal.html')
+    return render(request, 'pkmn_fbdd/crear_personal.html')
 
 
 def update_personal_html(request, id_persona):
@@ -188,7 +188,7 @@ def update_personal_html(request, id_persona):
 
     La plantilla recibirá el id_persona y hará GET/PUT a /api/personal/<id>/.
     """
-    return render(request, 'pkmn_fbdd/updatePersonal.html', {'id_persona': id_persona})
+    return render(request, 'pkmn_fbdd/update_personal.html', {'id_persona': id_persona})
 
 
 def delete_personal_html(request, id_persona):
@@ -196,5 +196,5 @@ def delete_personal_html(request, id_persona):
 
     La plantilla hará GET para mostrar datos y DELETE a /api/personal/<id>/.
     """
-    return render(request, 'pkmn_fbdd/eliminarPersonal.html', {'id_persona': id_persona})
+    return render(request, 'pkmn_fbdd/eliminar_personal.html', {'id_persona': id_persona})
 

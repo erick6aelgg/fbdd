@@ -13,7 +13,7 @@
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Personal</h1>
       <div class="flex items-center gap-3">
-        <a href="/crear-persona/" class="bg-indigo-600 text-white px-3 py-2 rounded hover:bg-indigo-500 text-sm">Crear persona</a>
+        <a href="/crear-personal/" class="bg-indigo-600 text-white px-3 py-2 rounded hover:bg-indigo-500 text-sm">Crear personal</a>
         <a href="/persona/" class="text-sm text-gray-300 hover:underline">Ver personas</a>
       </div>
     </div>
@@ -50,8 +50,8 @@
               </td>
               <td class="px-4 py-3 text-sm">
                 <!-- Link to persona update/delete pages (those exist) -->
-                <a href="/actualizar-persona/{{ p.persona.id_persona }}/" class="text-sm text-indigo-300 hover:underline mr-3">Editar persona</a>
-                <a href="/eliminar-persona/{{ p.persona.id_persona }}/" class="text-sm text-red-400 hover:underline">Eliminar persona</a>
+                <a href="/actualizar-personal/{{ p.persona.id_persona }}/" class="text-sm text-indigo-300 hover:underline mr-3">Editar personal</a>
+                <a href="/eliminar-personal/{{ p.persona.id_persona }}/" class="text-sm text-red-400 hover:underline">Eliminar personal</a>
               </td>
             </tr>
           {% empty %}
