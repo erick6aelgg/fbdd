@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 import json
 
 from pkmn_fbdd.models import Personal, Persona
@@ -171,4 +172,29 @@ def api_personal_detail(request, id_persona):
         return JsonResponse({'id_persona': id_persona, 'deleted': True}, status=200)
 
     return JsonResponse({'error': 'método incorrecto'}, status=405)
+
+
+def crear_personal_html(request):
+    """Renderiza un formulario HTML para crear un registro Personal.
+
+    El template cargará la lista de Personas vía AJAX (/api/persona/) para
+    poblar un selector y enviará POST a /api/personal/create/.
+    """
+    return render(request, 'pkmn_fbdd/crearPersonal.html')
+
+
+def update_personal_html(request, id_persona):
+    """Renderiza la página para editar un Personal existente.
+
+    La plantilla recibirá el id_persona y hará GET/PUT a /api/personal/<id>/.
+    """
+    return render(request, 'pkmn_fbdd/updatePersonal.html', {'id_persona': id_persona})
+
+
+def delete_personal_html(request, id_persona):
+    """Renderiza la página para eliminar un Personal existente.
+
+    La plantilla hará GET para mostrar datos y DELETE a /api/personal/<id>/.
+    """
+    return render(request, 'pkmn_fbdd/eliminarPersonal.html', {'id_persona': id_persona})
 

@@ -1,0 +1,118 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Crear Personal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+</head>
+<body class="dark bg-gray-900 min-h-screen py-8 text-gray-100">
+  <div class="max-w-2xl mx-auto bg-gray-800 shadow-md rounded-lg p-6 flex flex-col">
+    <h1 class="text-2xl font-bold mb-4 text-center">Crear Personal</h1>
+
+    <form id="personal-form" class="space-y-4">
+      <div>
+        <label class="block text-sm text-gray-300">Persona (seleccione una existente)</label>
+        <select id="persona-select" name="id_persona" required class="mt-2 block w-full rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2">
+          <option value="">Cargando personas...</option>
+        </select>
+      </div>
+
+      <div class="flex gap-6">
+        <label class="inline-flex items-center">
+          <input id="esparticipante" type="checkbox" name="esparticipante" class="h-4 w-4 text-indigo-400 bg-gray-700 border-gray-600" />
+          <span class="ml-2 text-sm text-gray-300">Es participante</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input id="esorganizador" type="checkbox" name="esorganizador" class="h-4 w-4 text-indigo-400 bg-gray-700 border-gray-600" />
+          <span class="ml-2 text-sm text-gray-300">Es organizador</span>
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Crear Personal</button>
+        <a href="/personal/" class="text-sm text-gray-300 hover:underline">Volver al listado</a>
+      </div>
+    </form>
+
+    <div id="message" class="mt-4"></div>
+  </div>
+
+  <script>
+    async function loadPersonas() {
+      const sel = document.getElementById('persona-select');
+      try {
+        const res = await fetch('/api/persona/');
+        const j = await res.json();
+        sel.innerHTML = '';
+        if (Array.isArray(j.personas) && j.personas.length) {
+          sel.innerHTML = '<option value="">-- Seleccione --</option>';
+          j.personas.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id_persona;
+            opt.text = `${p.id_persona} - ${p.nombres} ${p.apellido_paterno || ''}`;
+            sel.appendChild(opt);
+          });
+        } else {
+          sel.innerHTML = '<option value="">No hay personas disponibles</option>';
+        }
+      } catch (err) {
+        sel.innerHTML = '<option value="">Error cargando personas</option>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPersonas();
+
+      const form = document.getElementById('personal-form');
+      const msg = document.getElementById('message');
+
+      // mutual exclusion: when one checkbox is checked, uncheck the other
+      const chkPart = document.getElementById('esparticipante');
+      const chkOrg = document.getElementById('esorganizador');
+      chkPart.addEventListener('change', () => { if (chkPart.checked) chkOrg.checked = false; });
+      chkOrg.addEventListener('change', () => { if (chkOrg.checked) chkPart.checked = false; });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msg.innerHTML = '';
+        const data = {
+          id_persona: form.elements['id_persona'].value,
+          esparticipante: form.elements['esparticipante'].checked,
+          esorganizador: form.elements['esorganizador'].checked,
+        };
+
+        if (!data.id_persona) {
+          msg.innerHTML = `<div class="p-3 rounded bg-yellow-800 text-yellow-100">Seleccione una Persona válida.</div>`;
+          return;
+        }
+
+        // XOR validation: exactly one must be true
+        if (!(data.esparticipante ^ data.esorganizador)) {
+          msg.innerHTML = `<div class="p-3 rounded bg-yellow-800 text-yellow-100">Seleccione exactamente una opción: "Es participante" o "Es organizador".</div>`;
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/personal/create/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const j = await res.json().catch(() => ({}));
+          if (res.ok) {
+            msg.innerHTML = `<div class="p-3 rounded bg-green-800 text-green-100">Personal creado correctamente.</div>`;
+            form.reset();
+          } else {
+            msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error: ${j.error || res.statusText}</div>`;
+          }
+        } catch (err) {
+          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error de red: ${err.message}</div>`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

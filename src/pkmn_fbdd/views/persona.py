@@ -167,3 +167,8 @@ def update_persona_html(request, id_persona):
     # pasamos el id a la plantilla para que el JS haga el GET/PUT al endpoint REST
     return render(request, 'pkmn_fbdd/updatePersona.html', {'id_persona': id_persona})
 
+
+def delete_persona_html(request, id_persona):
+    # renderiza la plantilla para eliminar una persona existente
+    return render(request, 'pkmn_fbdd/eliminarPersona.html', {'id_persona': id_persona})
+
