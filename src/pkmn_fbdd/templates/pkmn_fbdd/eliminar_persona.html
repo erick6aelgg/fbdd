@@ -1,96 +1,135 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Eliminar Persona</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
-</head>
-<body class="dark bg-gray-900 min-h-screen py-8 text-gray-100">
-  <div class="max-w-2xl mx-auto bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center justify-center">
-    <h1 class="text-2xl font-bold mb-6 text-gray-100 text-center">Eliminar Persona</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Eliminar Persona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: "class" };
+    </script>
+  </head>
+  <body class="dark bg-gray-900 min-h-screen py-8 text-gray-100">
+    <div
+      class="max-w-2xl mx-auto bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center justify-center"
+    >
+      <h1 class="text-2xl font-bold mb-6 text-gray-100 text-center">
+        Eliminar Persona
+      </h1>
 
-    <div id="info" class="w-full space-y-4">
-      <div class="flex flex-col items-center justify-center text-center">
-        <label class="block text-sm font-medium text-gray-300">ID</label>
-  <div id="id_persona" class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2">-</div>
-      </div>
-
-      <div class="flex flex-col items-center justify-center text-center">
-        <label class="block text-sm font-medium text-gray-300">Nombres</label>
-        <div id="nombres" class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"></div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
+      <div id="info" class="w-full space-y-4">
         <div class="flex flex-col items-center justify-center text-center">
-          <label class="block text-sm font-medium text-gray-300">Apellido paterno</label>
-          <div id="apellido_paterno" class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"></div>
+          <label class="block text-sm font-medium text-gray-300">ID</label>
+          <div
+            id="id_persona"
+            class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+          >
+            -
+          </div>
         </div>
+
         <div class="flex flex-col items-center justify-center text-center">
-          <label class="block text-sm font-medium text-gray-300">Apellido materno</label>
-          <div id="apellido_materno" class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"></div>
+          <label class="block text-sm font-medium text-gray-300">Nombres</label>
+          <div
+            id="nombres"
+            class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col items-center justify-center text-center">
+            <label class="block text-sm font-medium text-gray-300"
+              >Apellido paterno</label
+            >
+            <div
+              id="apellido_paterno"
+              class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+            ></div>
+          </div>
+          <div class="flex flex-col items-center justify-center text-center">
+            <label class="block text-sm font-medium text-gray-300"
+              >Apellido materno</label
+            >
+            <div
+              id="apellido_materno"
+              class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+            ></div>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center text-center">
+          <label class="block text-sm font-medium text-gray-300"
+            >Fecha de nacimiento</label
+          >
+          <div
+            id="fecha_de_nacimiento"
+            class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+          ></div>
+        </div>
+
+        <div class="flex items-center gap-6 justify-center">
+          <div class="text-sm text-gray-300">Tipo:</div>
+          <div
+            id="tipo"
+            class="rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+          ></div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <button
+            id="delete-btn"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500"
+          >
+            Eliminar
+          </button>
+          <a href="/persona/" class="text-sm text-gray-300 hover:underline"
+            >Volver</a
+          >
         </div>
       </div>
 
-      <div class="flex flex-col items-center justify-center text-center">
-        <label class="block text-sm font-medium text-gray-300">Fecha de nacimiento</label>
-        <div id="fecha_de_nacimiento" class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"></div>
-      </div>
-
-      <div class="flex items-center gap-6 justify-center">
-        <div class="text-sm text-gray-300">Tipo:</div>
-        <div id="tipo" class="rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"></div>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <button id="delete-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500">Eliminar</button>
-        <a href="/persona/" class="text-sm text-gray-300 hover:underline">Volver</a>
-      </div>
+      <div id="message" class="mt-4 w-full"></div>
     </div>
 
-    <div id="message" class="mt-4 w-full"></div>
-  </div>
+    <script>
+      const ID_PERSONA = {{ id_persona }};
+      const msg = document.getElementById('message');
 
-  <script>
-    const ID_PERSONA = {{ id_persona }};
-    const msg = document.getElementById('message');
-
-    async function loadPersona(){
-      try{
-        const res = await fetch(`/api/persona/${ID_PERSONA}/`);
-        if (!res.ok) throw new Error('No se pudo obtener la persona');
-        const p = await res.json();
-        document.getElementById('id_persona').textContent = p.id_persona;
-        document.getElementById('nombres').textContent = p.nombres || '';
-        document.getElementById('apellido_paterno').textContent = p.apellido_paterno || '';
-        document.getElementById('apellido_materno').textContent = p.apellido_materno || '';
-        document.getElementById('fecha_de_nacimiento').textContent = p.fecha_de_nacimiento || '';
-        document.getElementById('tipo').textContent = p.espersonal ? 'Personal' : (p.esespectador ? 'Espectador' : 'N/A');
-      }catch(err){
-        msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error cargando persona: ${err.message}</div>`;
-      }
-    }
-
-    document.getElementById('delete-btn').addEventListener('click', async (e) =>{
-      if (!confirm('¿Eliminar esta persona? Esta acción no se puede deshacer.')) return;
-      try{
-        const res = await fetch(`/api/persona/${ID_PERSONA}/`, { method: 'DELETE' });
-        const j = await res.json().catch(()=>({}));
-        if (res.ok){
-          msg.innerHTML = `<div class="p-3 rounded bg-green-800 text-green-100">Persona eliminada.</div>`;
-          // opcional: redirigir a lista después de 1.5s
-          setTimeout(()=>{ window.location.href = '/'; }, 1200);
-        } else {
-          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error: ${j.error || res.statusText}</div>`;
+      async function loadPersona(){
+        try{
+          const res = await fetch(`/api/persona/${ID_PERSONA}/`);
+          if (!res.ok) throw new Error('No se pudo obtener la persona');
+          const p = await res.json();
+          document.getElementById('id_persona').textContent = p.id_persona;
+          document.getElementById('nombres').textContent = p.nombres || '';
+          document.getElementById('apellido_paterno').textContent = p.apellido_paterno || '';
+          document.getElementById('apellido_materno').textContent = p.apellido_materno || '';
+          document.getElementById('fecha_de_nacimiento').textContent = p.fecha_de_nacimiento || '';
+          document.getElementById('tipo').textContent = p.espersonal ? 'Personal' : (p.esespectador ? 'Espectador' : 'N/A');
+        }catch(err){
+          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error cargando persona: ${err.message}</div>`;
         }
-      }catch(err){
-        msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error de red: ${err.message}</div>`;
       }
-    });
 
-    loadPersona();
-  </script>
-</body>
+      document.getElementById('delete-btn').addEventListener('click', async (e) =>{
+        if (!confirm('¿Eliminar esta persona? Esta acción no se puede deshacer.')) return;
+        try{
+          const res = await fetch(`/api/persona/${ID_PERSONA}/`, { method: 'DELETE' });
+          const j = await res.json().catch(()=>({}));
+          if (res.ok){
+            msg.innerHTML = `<div class="p-3 rounded bg-green-800 text-green-100">Persona eliminada.</div>`;
+            // opcional: redirigir a lista después de 1.5s
+            setTimeout(()=>{ window.location.href = '/'; }, 1200);
+          } else {
+            msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error: ${j.error || res.statusText}</div>`;
+          }
+        }catch(err){
+          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error de red: ${err.message}</div>`;
+        }
+      });
+
+      loadPersona();
+    </script>
+  </body>
 </html>

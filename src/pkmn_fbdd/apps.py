@@ -1,3 +1,8 @@
+"""
+Configuración de la aplicación `pkmn_fbdd`.
+Define el nombre de la aplicación y otras configuraciones específicas.
+"""
+
 from django.apps import AppConfig
 
 

@@ -1,3 +1,8 @@
+"""
+Definición de las rutas (endpoints) de la aplicación `pkmn_fbdd`.
+Cada endpoint está asociado a una vista que maneja la lógica correspondiente.
+"""
+
 from django.urls import path
 from . import views
 from .views import persona as persona_views

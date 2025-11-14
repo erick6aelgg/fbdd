@@ -1,3 +1,8 @@
+"""
+Vistas relacionadas con el modelo `Personal`.
+Incluyen vistas para manejar solicitudes HTTP y renderizar plantillas HTML.
+"""
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -9,6 +14,9 @@ from ..services.personal import create_personal, delete_personal, list_personal,
 
 @csrf_exempt
 def api_personal_create(request):
+    """
+    Crea un nuevo registro de personal a través de una solicitud HTTP POST.
+    """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     try:
@@ -47,14 +55,8 @@ def api_personal_create(request):
 
 @csrf_exempt
 def api_personal_update(request):
-    """Update a Persona partially or fully.
-
-    Accepts PUT or PATCH with JSON body. Expected JSON:
-      {
-        "id_persona": 1,
-        "nombres": "Nuevo Nombre",
-        ...
-      }
+    """
+    Actualiza los datos de un registro de personal existente mediante una solicitud HTTP PUT o PATCH.
     """
     if request.method not in ('PUT', 'PATCH'):
         return JsonResponse({'error': 'método incorrecto'}, status=405)
@@ -83,9 +85,8 @@ def api_personal_update(request):
 
 @csrf_exempt
 def api_personal_delete(request):
-    """Delete a Persona
-
-    Expected JSON fields: id_persona
+    """
+    Elimina un registro de personal existente mediante una solicitud HTTP DELETE.
     """
     if request.method != 'DELETE':
         return JsonResponse({'error': 'método incorrecto'}, status=405)
@@ -109,7 +110,9 @@ def api_personal_delete(request):
 
 @csrf_exempt
 def api_personal(request):
-    """List all Personas as JSON array."""
+    """
+    Devuelve una lista de todo el personal en formato JSON mediante una solicitud HTTP GET.
+    """
     if request.method != 'GET':
         return JsonResponse({'error': 'método incorrecto'}, status=405)
 
@@ -130,6 +133,9 @@ def api_personal(request):
 
 @csrf_exempt
 def api_personal_detail(request, id_persona):
+    """
+    Maneja solicitudes HTTP para obtener, actualizar o eliminar un registro de personal específico.
+    """
     if request.method == 'GET':
         personal = get_personal(id_persona)
         if not personal:
@@ -175,26 +181,22 @@ def api_personal_detail(request, id_persona):
 
 
 def crear_personal_html(request):
-    """Renderiza un formulario HTML para crear un registro Personal.
-
-    El template cargará la lista de Personas vía AJAX (/api/persona/) para
-    poblar un selector y enviará POST a /api/personal/create/.
+    """
+    Renderiza la plantilla HTML para crear un nuevo registro de personal.
     """
     return render(request, 'pkmn_fbdd/crear_personal.html')
 
 
 def update_personal_html(request, id_persona):
-    """Renderiza la página para editar un Personal existente.
-
-    La plantilla recibirá el id_persona y hará GET/PUT a /api/personal/<id>/.
+    """
+    Renderiza la plantilla HTML para actualizar un registro de personal existente.
     """
     return render(request, 'pkmn_fbdd/update_personal.html', {'id_persona': id_persona})
 
 
 def delete_personal_html(request, id_persona):
-    """Renderiza la página para eliminar un Personal existente.
-
-    La plantilla hará GET para mostrar datos y DELETE a /api/personal/<id>/.
+    """
+    Renderiza la plantilla HTML para eliminar un registro de personal existente.
     """
     return render(request, 'pkmn_fbdd/eliminar_personal.html', {'id_persona': id_persona})
 

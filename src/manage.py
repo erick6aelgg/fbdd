@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+"""
+Archivo principal para la gestión de tareas administrativas en Django.
+Este archivo configura el entorno y ejecuta comandos de administración.
+"""
+
 import os
 import sys
 

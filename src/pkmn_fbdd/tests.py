@@ -1,3 +1,6 @@
-from django.test import TestCase
+"""
+Archivo para definir pruebas unitarias y de integración.
+Permite verificar el correcto funcionamiento de la aplicación.
+"""
 
-# Create your tests here.
+from django.test import TestCase

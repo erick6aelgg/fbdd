@@ -1,3 +1,8 @@
+"""
+Servicios relacionados con el modelo `Personal`.
+Incluyen operaciones CRUD y lógica de negocio asociada.
+"""
+
 from sqlite3 import IntegrityError
 from django.db import transaction, IntegrityError
 from ..models import Personal, Persona
@@ -5,6 +10,9 @@ import datetime
 
 
 def list_personal():
+    """
+    Devuelve una lista de todo el personal registrado en la base de datos.
+    """
     return Personal.objects.all()
 
 
@@ -26,6 +34,9 @@ def _to_bool(value):
 
 
 def get_personal(id_persona):
+    """
+    Obtiene un registro de personal específico por el ID de la persona asociada.
+    """
     # The Personal model uses a OneToOneField named `persona` whose
     # underlying DB column is `id_persona`. Use persona_id (or pk) to look up.
     return Personal.objects.filter(persona_id=id_persona).first()
@@ -33,7 +44,8 @@ def get_personal(id_persona):
 
 @transaction.atomic
 def create_personal(data):
-    """Create a Personal row linked to an existing Persona.
+    """
+    Crea un nuevo registro de personal asociado a una persona existente.
 
     Raises ValueError with a user-friendly message when the referenced Persona
     does not exist or when a constraint is violated (e.g. already exists).
@@ -64,6 +76,9 @@ def create_personal(data):
 
 @transaction.atomic
 def update_personal(id_persona, updates):
+    """
+    Actualiza los datos de un registro de personal existente.
+    """
     # Lookup by the FK/PK value
     personal = Personal.objects.get(persona_id=id_persona)
     for k, v in updates.items():
@@ -84,6 +99,9 @@ def update_personal(id_persona, updates):
 
 @transaction.atomic
 def delete_personal(id_persona):
+    """
+    Elimina un registro de personal de la base de datos por el ID de la persona asociada.
+    """
     personal = Personal.objects.get(persona_id=id_persona)
     personal.delete()
     return True

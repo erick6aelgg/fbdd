@@ -1,70 +1,93 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Eliminar Personal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
-</head>
-<body class="dark bg-gray-900 min-h-screen py-8 text-gray-100">
-  <div class="max-w-2xl mx-auto bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center justify-center">
-    <h1 class="text-2xl font-bold mb-6 text-gray-100 text-center">Eliminar Personal</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Eliminar Personal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: "class" };
+    </script>
+  </head>
+  <body class="dark bg-gray-900 min-h-screen py-8 text-gray-100">
+    <div
+      class="max-w-2xl mx-auto bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center justify-center"
+    >
+      <h1 class="text-2xl font-bold mb-6 text-gray-100 text-center">
+        Eliminar Personal
+      </h1>
 
-    <div id="info" class="w-full space-y-4">
-      <div class="flex flex-col items-center justify-center text-center">
-        <label class="block text-sm font-medium text-gray-300">ID Persona</label>
-        <div id="id_persona" class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2">-</div>
+      <div id="info" class="w-full space-y-4">
+        <div class="flex flex-col items-center justify-center text-center">
+          <label class="block text-sm font-medium text-gray-300"
+            >ID Persona</label
+          >
+          <div
+            id="id_persona"
+            class="mt-2 rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+          >
+            -
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 justify-center">
+          <div class="text-sm text-gray-300">Tipo:</div>
+          <div
+            id="tipo"
+            class="rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"
+          ></div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <button
+            id="delete-btn"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500"
+          >
+            Eliminar
+          </button>
+          <a href="/personal/" class="text-sm text-gray-300 hover:underline"
+            >Volver al listado</a
+          >
+        </div>
       </div>
 
-      <div class="flex items-center gap-6 justify-center">
-        <div class="text-sm text-gray-300">Tipo:</div>
-        <div id="tipo" class="rounded-lg border border-gray-700 bg-gray-700 text-gray-100 px-3 py-2"></div>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <button id="delete-btn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500">Eliminar</button>
-        <a href="/personal/" class="text-sm text-gray-300 hover:underline">Volver al listado</a>
-      </div>
+      <div id="message" class="mt-4 w-full"></div>
     </div>
 
-    <div id="message" class="mt-4 w-full"></div>
-  </div>
+    <script>
+      const ID_PERSONA = {{ id_persona }};
+      const msg = document.getElementById('message');
 
-  <script>
-    const ID_PERSONA = {{ id_persona }};
-    const msg = document.getElementById('message');
-
-    async function loadPersonal(){
-      try{
-        const res = await fetch(`/api/personal/${ID_PERSONA}/`);
-        if (!res.ok) throw new Error('No se pudo obtener el personal');
-        const p = await res.json();
-        document.getElementById('id_persona').textContent = p.persona || '';
-        document.getElementById('tipo').textContent = p.esparticipante ? 'Participante' : (p.esorganizador ? 'Organizador' : 'N/A');
-      }catch(err){
-        msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error cargando personal: ${err.message}</div>`;
-      }
-    }
-
-    document.getElementById('delete-btn').addEventListener('click', async (e) =>{
-      if (!confirm('¿Eliminar este registro de personal? Esta acción no se puede deshacer.')) return;
-      try{
-        const res = await fetch(`/api/personal/${ID_PERSONA}/`, { method: 'DELETE' });
-        const j = await res.json().catch(()=>({}));
-        if (res.ok){
-          msg.innerHTML = `<div class="p-3 rounded bg-green-800 text-green-100">Personal eliminado.</div>`;
-          setTimeout(()=>{ window.location.href = '/personal/'; }, 1200);
-        } else {
-          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error: ${j.error || res.statusText}</div>`;
+      async function loadPersonal(){
+        try{
+          const res = await fetch(`/api/personal/${ID_PERSONA}/`);
+          if (!res.ok) throw new Error('No se pudo obtener el personal');
+          const p = await res.json();
+          document.getElementById('id_persona').textContent = p.persona || '';
+          document.getElementById('tipo').textContent = p.esparticipante ? 'Participante' : (p.esorganizador ? 'Organizador' : 'N/A');
+        }catch(err){
+          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error cargando personal: ${err.message}</div>`;
         }
-      }catch(err){
-        msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error de red: ${err.message}</div>`;
       }
-    });
 
-    loadPersonal();
-  </script>
-</body>
+      document.getElementById('delete-btn').addEventListener('click', async (e) =>{
+        if (!confirm('¿Eliminar este registro de personal? Esta acción no se puede deshacer.')) return;
+        try{
+          const res = await fetch(`/api/personal/${ID_PERSONA}/`, { method: 'DELETE' });
+          const j = await res.json().catch(()=>({}));
+          if (res.ok){
+            msg.innerHTML = `<div class="p-3 rounded bg-green-800 text-green-100">Personal eliminado.</div>`;
+            setTimeout(()=>{ window.location.href = '/personal/'; }, 1200);
+          } else {
+            msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error: ${j.error || res.statusText}</div>`;
+          }
+        }catch(err){
+          msg.innerHTML = `<div class="p-3 rounded bg-red-800 text-red-100">Error de red: ${err.message}</div>`;
+        }
+      });
+
+      loadPersonal();
+    </script>
+  </body>
 </html>

@@ -1,6 +1,15 @@
+"""
+Definición de los modelos de la aplicación `pkmn_fbdd`.
+Cada modelo representa una tabla en la base de datos.
+"""
+
 from django.db import models
 
 class Persona(models.Model):
+    """
+    Modelo Persona 
+    Incluye información personal como nombres, apellidos y roles.
+    """
     id_persona = models.AutoField(primary_key=True)
     fecha_de_nacimiento = models.DateField()
     apellido_paterno = models.CharField(max_length=100)
@@ -15,9 +24,10 @@ class Persona(models.Model):
         return str(self.id_persona) + " - " + self.nombres
     
 class Personal(models.Model):
-    # In the DB the table `personal` uses the column `id_persona` both as
-    # primary key and as FK to `persona(id_persona)`. Model this by making
-    # the OneToOneField the primary key and mapping it to db_column 'id_persona'.
+    """
+    Modelo que representa al personal.
+    Define roles específicos como participante u organizador.
+    """
     persona = models.OneToOneField(
         'pkmn_fbdd.Persona',
         on_delete=models.CASCADE,

@@ -1,3 +1,8 @@
+"""
+Vistas relacionadas con el modelo `Persona`.
+Incluyen vistas para manejar solicitudes HTTP y renderizar plantillas HTML.
+"""
+
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
@@ -5,6 +10,9 @@ from ..services.persona import create_persona, update_persona, delete_persona, l
 from ..models import Persona
 @csrf_exempt
 def api_persona_create(request):
+    """
+    Crea una nueva persona a través de una solicitud HTTP POST.
+    """
     payload = json.loads(request.body.decode('utf-8'))
     persona = create_persona(payload)
     return JsonResponse({'id_persona': persona.id_persona}, status=201)
@@ -12,7 +20,8 @@ def api_persona_create(request):
 
 @csrf_exempt
 def api_persona_update(request):
-    """Update a Persona partially or fully.
+    """
+    Actualiza los datos de una persona existente mediante una solicitud HTTP PUT o PATCH.
 
     Accepts PUT or PATCH with JSON body. Expected JSON:
       {
@@ -52,7 +61,8 @@ def api_persona_update(request):
 
 @csrf_exempt
 def api_persona_delete(request):
-    """Delete a Persona
+    """
+    Elimina una persona existente mediante una solicitud HTTP DELETE.
 
     Expected JSON fields: id_persona
     """
@@ -78,7 +88,9 @@ def api_persona_delete(request):
 
 @csrf_exempt
 def api_persona(request):
-    """List all Personas as JSON array."""
+    """
+    Devuelve una lista de todas las personas en formato JSON mediante una solicitud HTTP GET.
+    """
     if request.method != 'GET':
         return JsonResponse({'error': 'método incorrecto'}, status=405)
 
@@ -103,6 +115,9 @@ def api_persona(request):
 
 @csrf_exempt
 def api_persona_detail(request, id_persona):
+    """
+    Maneja solicitudes HTTP para obtener, actualizar o eliminar una persona específica.
+    """
     if request.method == 'GET':
         persona = get_persona(id_persona)
         if not persona:
@@ -158,17 +173,23 @@ def api_persona_detail(request, id_persona):
 from django.shortcuts import render
 
 def crear_persona_html(request):
-    # renderiza la plantilla que creamos: templates/pkmn_fbdd/crear_persona.html
+    """
+    Renderiza la plantilla HTML para crear una nueva persona.
+    """
     return render(request, 'pkmn_fbdd/crear_persona.html')
 
 
 def update_persona_html(request, id_persona):
-    # renderiza la plantilla para actualizar una persona existente
+    """
+    Renderiza la plantilla HTML para actualizar una persona existente.
+    """
     # pasamos el id a la plantilla para que el JS haga el GET/PUT al endpoint REST
     return render(request, 'pkmn_fbdd/update_persona.html', {'id_persona': id_persona})
 
 
 def delete_persona_html(request, id_persona):
-    # renderiza la plantilla para eliminar una persona existente
+    """
+    Renderiza la plantilla HTML para eliminar una persona existente.
+    """
     return render(request, 'pkmn_fbdd/eliminar_persona.html', {'id_persona': id_persona})
 

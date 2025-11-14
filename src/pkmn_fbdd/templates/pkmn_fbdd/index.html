@@ -1,28 +1,45 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Inicio — pkmn_fbdd</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
-</head>
-<body class="dark bg-gray-900 min-h-screen text-gray-100">
-  <div class="max-w-3xl mx-auto py-24 px-6">
-    <div class="bg-gray-800 rounded-lg shadow-md p-8 text-center">
-      <h1 class="text-3xl font-bold mb-4">Aplicación para interactuar con nuestra DB</h1>
-      <p class="text-gray-300 mb-6">Selecciona una sección para ver o gestionar registros.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Inicio — pkmn_fbdd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: "class" };
+    </script>
+  </head>
+  <body class="dark bg-gray-900 min-h-screen text-gray-100">
+    <div class="max-w-3xl mx-auto py-24 px-6">
+      <div class="bg-gray-800 rounded-lg shadow-md p-8 text-center">
+        <h1 class="text-3xl font-bold mb-4">
+          Aplicación para interactuar con nuestra DB
+        </h1>
+        <p class="text-gray-300 mb-6">
+          Selecciona una sección para ver o gestionar registros.
+        </p>
 
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/persona/" class="block w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-lg text-lg">Listado de Personas</a>
-        <a href="/personal/" class="block w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg text-lg">Listado de Personal</a>
-      </div>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/persona/"
+            class="block w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-lg text-lg"
+            >Listado de Personas</a
+          >
+          <a
+            href="/personal/"
+            class="block w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg text-lg"
+            >Listado de Personal</a
+          >
+        </div>
 
-      <div class="mt-6 text-sm text-gray-400">
-        <span>También puedes crear nuevas entradas desde los enlaces en cada lista.</span>
+        <div class="mt-6 text-sm text-gray-400">
+          <span
+            >También puedes crear nuevas entradas desde los enlaces en cada
+            lista.</span
+          >
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
