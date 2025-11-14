@@ -22,4 +22,5 @@ def lista_personal(request):
 
 
 def index(request):
-    return HttpResponse("Hola — la app pkmn_fbdd está funcionando.")
+    # Render a small navigation page that links to the lists for Personas and Personal.
+    return render(request, 'pkmn_fbdd/index.html')
