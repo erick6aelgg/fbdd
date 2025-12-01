@@ -176,9 +176,14 @@ ALTER TABLE Participante ADD CONSTRAINT participante_fkey1
 FOREIGN KEY (id_persona) REFERENCES Personal(id_persona)
 ON DELETE CASCADE;
 
+/*
+Dado que multi debe de existir, se agrega tras la creación de Multi
+===
 ALTER TABLE Participante ADD CONSTRAINT participante_fkey2
 FOREIGN KEY (id_torneo) REFERENCES Multi(id_torneo)
 ON DELETE CASCADE;
+===
+*/
 
 -- Asegurar que el vínculo a la persona exista
 ALTER TABLE Participante ALTER COLUMN id_persona SET NOT NULL;
@@ -189,6 +194,7 @@ COMMENT ON COLUMN Participante.id_persona IS 'Identificador de la persona que es
 COMMENT ON COLUMN Participante.num_cuenta IS 'Número de cuenta del participante';
 COMMENT ON COLUMN Participante.facultad IS 'Facultad a la que pertenece el participante';
 COMMENT ON COLUMN Participante.carrera IS 'Carrera del participante';
+COMMENT ON COLUMN Participante.ubicacion IS 'Ubicación actual del participante';
 COMMENT ON CONSTRAINT participante_pkey ON Participante IS 'Llave primaria de la tabla Participante';
 COMMENT ON CONSTRAINT participante_fkey1 ON Participante IS 'Llave foránea que referencia a Personal';
 COMMENT ON CONSTRAINT participante_d1 ON Participante IS 'Restricción para que facultad no sea vacío';
@@ -547,7 +553,6 @@ CREATE TABLE Multi (
 -- Dominio
 ALTER TABLE Multi ALTER COLUMN esCaptura SET NOT NULL;
 ALTER TABLE Multi ALTER COLUMN esDistanciaRecorrida SET NOT NULL;
-ALTER TABLE Multi ALTER COLUMN ubicacion SET NOT NULL;
 
 -- Entidad
 ALTER TABLE Multi ADD CONSTRAINT multi_pkey
@@ -558,6 +563,10 @@ ALTER TABLE Multi ADD CONSTRAINT multi_fkey1
 FOREIGN KEY (id_torneo) REFERENCES Torneo(id_torneo)
 ON DELETE CASCADE;
 
+ALTER TABLE Participante ADD CONSTRAINT participante_fkey2
+FOREIGN KEY (id_torneo) REFERENCES Multi(id_torneo)
+ON DELETE CASCADE;
+
 -- COMENTARIOS Multi
 COMMENT ON TABLE Multi IS 'Tabla que representa los torneos de tipo multijugador, que pueden incluir diferentes modalidades de competencia';
 
@@ -565,7 +574,6 @@ COMMENT ON TABLE Multi IS 'Tabla que representa los torneos de tipo multijugador
 COMMENT ON COLUMN Multi.id_torneo IS 'Identificador único del torneo multijugador (llave primaria y foránea)';
 COMMENT ON COLUMN Multi.esCaptura IS 'Indica si el torneo multi incluye la modalidad de captura de Pokémon';
 COMMENT ON COLUMN Multi.esDistanciaRecorrida IS 'Indica si el torneo multi incluye la modalidad de distancia recorrida';
-COMMENT ON COLUMN Multi.ubicacion IS 'Ubicación geográfica donde se lleva a cabo el torneo';
 
 -- Comentarios de constraints
 COMMENT ON CONSTRAINT multi_pkey ON Multi IS 'Restricción de llave primaria para identificar únicamente cada torneo multijugador';
@@ -602,7 +610,7 @@ CREATE TABLE Distancia (
 
 -- Entidad
 ALTER TABLE Distancia ADD CONSTRAINT distancia_pkey
-PRIMARY KEY (id_torneo, distancia);
+PRIMARY KEY (id_persona, distancia);
 
 -- Referencial
 ALTER TABLE Distancia ADD CONSTRAINT distancia_fkey1
@@ -611,7 +619,7 @@ ON DELETE CASCADE;
 
 -- COMENTARIOS Distancia
 COMMENT ON TABLE Distancia IS 'Tabla que representa la modalidad de distancia recorrida en torneos de un punto a otro';
-COMMENT ON COLUMN Distancia.id_torneo IS 'Identificador único del torneo multijugador (llave foránea)';
+COMMENT ON COLUMN Distancia.id_persona IS 'Identificador único del participante asociado (llave foránea)';
 COMMENT ON COLUMN Distancia.distancia IS 'Distancia en kilómetros que los participantes recorren de un punto a otro';
 COMMENT ON CONSTRAINT distancia_pkey ON Distancia IS 'Restricción de llave primaria compuesta por id_torneo y distancia';
 
