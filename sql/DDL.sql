@@ -1119,3 +1119,126 @@ FROM information_schema.tables
 WHERE table_schema = 'public' 
 ORDER BY table_name;
 
+-- ============================================
+-- DISPARADORES PARA VALIDAR ROLES E INMUTABILIDAD
+-- ============================================
+
+-- Función: validar roles en Persona y prohibir su modificación después de creada
+CREATE OR REPLACE FUNCTION persona_rol()
+RETURNS trigger AS $$
+BEGIN
+    -- Asegurar exactamente un rol verdadero
+    IF ( (COALESCE(NEW.esPersonal, FALSE)::int + COALESCE(NEW.esEspectador, FALSE)::int) <> 1 ) THEN
+        RAISE EXCEPTION 'Una persona solo puede tener un rol';
+    END IF;
+
+    IF (TG_OP = 'UPDATE') THEN
+        IF (NEW.esPersonal IS DISTINCT FROM OLD.esPersonal OR NEW.esEspectador IS DISTINCT FROM OLD.esEspectador) THEN
+            RAISE EXCEPTION 'Los roles de Persona no pueden ser modificados';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER persona_roles
+BEFORE INSERT OR UPDATE ON Persona
+FOR EACH ROW EXECUTE FUNCTION persona_rol();
+
+
+-- Función: validar roles en Personal y asegurar consistencia con Persona
+CREATE OR REPLACE FUNCTION personal_rol()
+RETURNS trigger AS $$
+DECLARE
+    padre_personal RECORD;
+BEGIN
+    -- Asegurar exactamente un rol verdadero en Personal
+    IF ( (COALESCE(NEW.esParticipante, FALSE)::int + COALESCE(NEW.esOrganizador, FALSE)::int) <> 1 ) THEN
+        RAISE EXCEPTION 'Personal solo puede tener un rol';
+    END IF;
+
+    SELECT esPersonal INTO padre_personal FROM Persona WHERE id_persona = NEW.id_persona;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No existe Persona con id % referenciada por Personal', NEW.id_persona;
+    END IF;
+    IF COALESCE(padre_personal.esPersonal, FALSE) = FALSE THEN
+        RAISE EXCEPTION 'La Persona % no tiene este rol';
+    END IF;
+
+    IF (TG_OP = 'UPDATE') THEN
+        IF (NEW.esParticipante IS DISTINCT FROM OLD.esParticipante OR NEW.esOrganizador IS DISTINCT FROM OLD.esOrganizador) THEN
+            RAISE EXCEPTION 'Los roles de Personal no pueden ser modificados';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER personal_roles
+BEFORE INSERT OR UPDATE ON Personal
+FOR EACH ROW EXECUTE FUNCTION personal_rol();
+
+
+-- Función: validar roles en Organizador y asegurar consistencia con Personal
+CREATE OR REPLACE FUNCTION organizador_rol()
+RETURNS trigger AS $$
+DECLARE
+    padre_personal RECORD;
+    roles_true_count int := 0;
+BEGIN
+    roles_true_count := COALESCE(NEW.esRegistrador, FALSE)::int
+                      + COALESCE(NEW.esCuidador, FALSE)::int
+                      + COALESCE(NEW.esLimpiador, FALSE)::int
+                      + COALESCE(NEW.esVendedor, FALSE)::int;
+    IF roles_true_count <> 1 THEN
+        RAISE EXCEPTION 'Organizador solo puede tener un rol';
+    END IF;
+
+    SELECT esOrganizador INTO padre_personal FROM Personal WHERE id_persona = NEW.id_persona;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No existe Personal con id % referenciado por Organizador', NEW.id_persona;
+    END IF;
+    IF COALESCE(padre_personal.esOrganizador, FALSE) = FALSE THEN
+        RAISE EXCEPTION 'La persona % no tiene este rol';
+    END IF;
+
+    IF (TG_OP = 'UPDATE') THEN
+        IF (NEW.esRegistrador IS DISTINCT FROM OLD.esRegistrador
+            OR NEW.esCuidador IS DISTINCT FROM OLD.esCuidador
+            OR NEW.esLimpiador IS DISTINCT FROM OLD.esLimpiador
+            OR NEW.esVendedor IS DISTINCT FROM OLD.esVendedor) THEN
+            RAISE EXCEPTION 'Los roles de Organizador no pueden ser modificados';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER organizador_roles
+BEFORE INSERT OR UPDATE ON Organizador
+FOR EACH ROW EXECUTE FUNCTION organizador_rol();
+
+
+-- Disparador adicional en Espectador para asegurar coherencia con Persona
+CREATE OR REPLACE FUNCTION espectador_integridad()
+RETURNS trigger AS $$
+DECLARE
+    p RECORD;
+BEGIN
+    SELECT esEspectador INTO p FROM Persona WHERE id_persona = NEW.id_persona;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No existe Persona con id % referenciada por Espectador', NEW.id_persona;
+    END IF;
+    IF COALESCE(p.esEspectador, FALSE) = FALSE THEN
+        RAISE EXCEPTION 'La Persona % no es un Espectador', NEW.id_persona;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER espectador_integridad
+BEFORE INSERT ON Espectador
+FOR EACH ROW EXECUTE FUNCTION espectador_integridad();
