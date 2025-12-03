@@ -165,7 +165,7 @@ CHECK (carrera <> '');
 ALTER TABLE Participante ALTER COLUMN carrera SET NOT NULL;
 
 ALTER TABLE Participante ADD CONSTRAINT participante_d3
-CHECK (num_cuenta > 0 AND num_cuenta < 999999);
+CHECK (num_cuenta > 0 AND num_cuenta < 999999999);
 ALTER TABLE Participante ALTER COLUMN num_cuenta SET NOT NULL;
 
 -- Entidad

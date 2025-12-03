@@ -21006,3 +21006,5 @@ insert into Registrador (id_persona, salario_base) values (4997, 14279);
 insert into Registrador (id_persona, salario_base) values (4998, 14276);
 insert into Registrador (id_persona, salario_base) values (4999, 12619);
 insert into Registrador (id_persona, salario_base) values (5000, 12560);
+
+-- Falta añadir emails, telefonos, cuenta, registrar, evento, 
