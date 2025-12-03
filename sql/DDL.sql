@@ -59,6 +59,7 @@ ALTER TABLE Persona ALTER COLUMN apellido_materno SET NOT NULL;
     -- COMENTARIOS Persona
     COMMENT ON TABLE Persona IS 'Tabla que almacena información de personas que pueden ser personal o espectadores';
     COMMENT ON COLUMN Persona.id_persona IS 'Identificador único de la persona';
+    COMMENT ON COLUMN Persona.fecha_de_nacimiento IS 'Fecha de nacimiento de la persona';
     COMMENT ON COLUMN Persona.apellido_paterno IS 'Apellido paterno de la persona';
     COMMENT ON COLUMN Persona.apellido_materno IS 'Apellido materno de la persona';
     COMMENT ON COLUMN Persona.nombres IS 'Nombres de la persona';
@@ -622,6 +623,8 @@ COMMENT ON TABLE Distancia IS 'Tabla que representa la modalidad de distancia re
 COMMENT ON COLUMN Distancia.id_persona IS 'Identificador único del participante asociado (llave foránea)';
 COMMENT ON COLUMN Distancia.distancia IS 'Distancia en kilómetros que los participantes recorren de un punto a otro';
 COMMENT ON CONSTRAINT distancia_pkey ON Distancia IS 'Restricción de llave primaria compuesta por id_torneo y distancia';
+COMMENT ON CONSTRAINT distancia_fkey1 ON Distancia IS 'Llave foránea que referencia a Participante';
+
 
 -- Tabla Alimento
 CREATE TABLE Alimento (
@@ -1048,6 +1051,7 @@ COMMENT ON COLUMN Combatir.id_torneo IS 'Identificador del torneo al que pertene
 COMMENT ON COLUMN Combatir.codigo IS 'Código de la cuenta a la que pertenece el pokémon (FK a Cuenta.codigo)';
 COMMENT ON CONSTRAINT combatir_fkey1 ON Combatir IS 'Restricción referencial que verifica que id_pokemon exista en la tabla Pokemon y codigo en Cuenta';
 COMMENT ON CONSTRAINT combatir_fkey2 ON Combatir IS 'Restricción referencial que verifica que id_combate exista en la tabla Combate y id_torneo en Torneo';
+COMMENT ON CONSTRAINT combatir_uk1 ON Combatir IS 'Restricción de integridad que asegura que el id_combate, id_pokemon y el código sean únicos';
 
 -- Tabla Ser
 CREATE TABLE Ser (
