@@ -37,12 +37,12 @@ BEGIN
         RAISE EXCEPTION 'Personal solo puede tener un rol';
     END IF;
 
-    SELECT esPersonal INTO padre_personal FROM Persona WHERE id_persona = NEW.id_persona;
+    SELECT * INTO padre_personal FROM Persona WHERE id_persona = NEW.id_persona;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'No existe Persona con id % referenciada por Personal', NEW.id_persona;
     END IF;
     IF COALESCE(padre_personal.esPersonal, FALSE) = FALSE THEN
-        RAISE EXCEPTION 'La Persona % no tiene este rol';
+        RAISE EXCEPTION 'La Persona % no tiene este rol', NEW.id_persona;
     END IF;
 
     IF (TG_OP = 'UPDATE') THEN
@@ -75,12 +75,12 @@ BEGIN
         RAISE EXCEPTION 'Organizador solo puede tener un rol';
     END IF;
 
-    SELECT esOrganizador INTO padre_personal FROM Personal WHERE id_persona = NEW.id_persona;
+    SELECT * INTO padre_personal FROM Personal WHERE id_persona = NEW.id_persona;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'No existe Personal con id % referenciado por Organizador', NEW.id_persona;
     END IF;
     IF COALESCE(padre_personal.esOrganizador, FALSE) = FALSE THEN
-        RAISE EXCEPTION 'La persona % no tiene este rol';
+        RAISE EXCEPTION 'La persona % no tiene este rol', NEW.id_persona;
     END IF;
 
     IF (TG_OP = 'UPDATE') THEN
@@ -95,10 +95,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
-CREATE TRIGGER organizador_roles
-BEFORE INSERT OR UPDATE ON Organizador
-FOR EACH ROW EXECUTE FUNCTION organizador_rol();
 
 
 -- Disparador adicional en Espectador para asegurar coherencia con Persona
