@@ -107,7 +107,8 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Espectador ADD CONSTRAINT espectador_fkey1
 FOREIGN KEY (id_persona) REFERENCES Persona(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Espectador
 COMMENT ON TABLE Espectador IS 'Tabla que almacena información de los espectadores';
@@ -134,7 +135,9 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Personal ADD CONSTRAINT personal_fkey1
 FOREIGN KEY (id_persona) REFERENCES Persona(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
 
 -- COMENTARIOS Personal
 COMMENT ON TABLE Personal IS 'Tabla que almacena información del personal del evento';
@@ -175,14 +178,16 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Participante ADD CONSTRAINT participante_fkey1
 FOREIGN KEY (id_persona) REFERENCES Personal(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 /*
 Dado que multi debe de existir, se agrega tras la creación de Multi
 ===
 ALTER TABLE Participante ADD CONSTRAINT participante_fkey2
 FOREIGN KEY (id_torneo) REFERENCES Multi(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 ===
 */
 
@@ -234,7 +239,8 @@ PRIMARY KEY (codigo);
 -- Referencial
 ALTER TABLE Cuenta ADD CONSTRAINT cuenta_fkey1
 FOREIGN KEY (id_persona) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Cuenta
 COMMENT ON TABLE Cuenta IS 'Tabla que almacena las cuentas de los participantes';
@@ -301,7 +307,8 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Organizador ADD CONSTRAINT organizador_fkey1
 FOREIGN KEY (id_persona) REFERENCES Personal(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Organizador
 COMMENT ON TABLE Organizador IS 'Tabla que representa a los organizadores del evento';
@@ -347,7 +354,8 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Registrador ADD CONSTRAINT registrador_fkey1
 FOREIGN KEY (id_persona) REFERENCES Organizador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Registrador
 COMMENT ON TABLE Registrador IS 'Tabla que representa a los registradores del evento, quienes se encargan de registrar participantes';
@@ -390,7 +398,8 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Cuidador ADD CONSTRAINT cuidador_fkey1
 FOREIGN KEY (id_persona) REFERENCES Organizador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Cuidador
 COMMENT ON TABLE Cuidador IS 'Tabla que representa a los cuidadores del evento, responsables de vigilar áreas específicas';
@@ -438,7 +447,8 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Limpiador ADD CONSTRAINT limpiador_fkey1
 FOREIGN KEY (id_persona) REFERENCES Organizador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Limpiador
 COMMENT ON TABLE Limpiador IS 'Tabla que representa a los limpiadores del evento, encargados de mantener limpias las instalaciones';
@@ -475,7 +485,8 @@ PRIMARY KEY (id_persona);
 -- Referencial
 ALTER TABLE Vendedor ADD CONSTRAINT vendedor_fkey1
 FOREIGN KEY (id_persona) REFERENCES Organizador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Vendedor
 COMMENT ON TABLE Vendedor IS 'Tabla que representa a los vendedores del evento, encargados de vender alimentos';
@@ -523,11 +534,13 @@ PRIMARY KEY (id_torneo);
 -- Referencial
 ALTER TABLE Torneo ADD CONSTRAINT torneo_fkey1
 FOREIGN KEY (edicion) REFERENCES Evento(edicion)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Torneo ADD CONSTRAINT torneo_fkey2
 FOREIGN KEY (id_persona) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Torneo
 COMMENT ON TABLE Torneo IS 'Tabla en la que se guarda la información relacionada a los torneos';
@@ -562,11 +575,13 @@ PRIMARY KEY (id_torneo);
 -- Referencial
 ALTER TABLE Multi ADD CONSTRAINT multi_fkey1
 FOREIGN KEY (id_torneo) REFERENCES Torneo(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Participante ADD CONSTRAINT participante_fkey2
 FOREIGN KEY (id_torneo) REFERENCES Multi(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Multi
 COMMENT ON TABLE Multi IS 'Tabla que representa los torneos de tipo multijugador, que pueden incluir diferentes modalidades de competencia';
@@ -592,7 +607,8 @@ PRIMARY KEY (id_torneo);
 -- Referencial
 ALTER TABLE Pelea ADD CONSTRAINT pelea_fkey1
 FOREIGN KEY (id_torneo) REFERENCES Torneo(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Pelea
 COMMENT ON TABLE Pelea IS 'Tabla que representa los torneos de tipo pelea entre Pokémon';
@@ -616,7 +632,8 @@ PRIMARY KEY (id_persona, distancia);
 -- Referencial
 ALTER TABLE Distancia ADD CONSTRAINT distancia_fkey1
 FOREIGN KEY (id_persona) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Distancia
 COMMENT ON TABLE Distancia IS 'Tabla que representa la modalidad de distancia recorrida en torneos de un punto a otro';
@@ -664,7 +681,8 @@ PRIMARY KEY (id_alimento);
 -- Referencial
 ALTER TABLE Alimento ADD CONSTRAINT alimento_fkey1
 FOREIGN KEY (id_persona) REFERENCES Vendedor(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Alimento
 COMMENT ON TABLE Alimento IS 'Tabla que representa los alimentos disponibles para venta en el evento';
@@ -740,11 +758,13 @@ PRIMARY KEY (id_pokemon, codigo);
 -- Referencial
 ALTER TABLE Pokemon ADD CONSTRAINT pokemon_fkey1
 FOREIGN KEY (codigo) REFERENCES Cuenta(codigo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Pokemon ADD CONSTRAINT pokemon_fkey2
 FOREIGN KEY (id_torneo) REFERENCES Torneo(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Pokemon
 COMMENT ON TABLE Pokemon IS 'Tabla en la que se guarda la información relacionada a los pokemones';
@@ -797,7 +817,8 @@ PRIMARY KEY (id_combate, id_torneo);
 -- Referencial
 ALTER TABLE Combate ADD CONSTRAINT combate_fkey1
 FOREIGN KEY (id_torneo) REFERENCES Pelea(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Combate
 COMMENT ON TABLE Combate IS 'Tabla en la que se guarda la información relacionada a los combates';
@@ -827,7 +848,8 @@ PRIMARY KEY (id_persona, telefono);
 -- Referencial
 ALTER TABLE Telefonos ADD CONSTRAINT telefonos_fkey1
 FOREIGN KEY (id_persona) REFERENCES Personal(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Telefonos
 COMMENT ON TABLE Telefonos IS 'Tabla que almacena los números telefónicos del personal del evento';
@@ -864,7 +886,8 @@ UNIQUE (email);
 -- Referencial
 ALTER TABLE Emails ADD CONSTRAINT emails_fkey1
 FOREIGN KEY (id_persona) REFERENCES Personal(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Emails
 COMMENT ON TABLE Emails IS 'Tabla en la que se guardan los emails de las personas';
@@ -888,11 +911,13 @@ CREATE TABLE Trabajar (
 -- Referencial
 ALTER TABLE Trabajar ADD CONSTRAINT trabajar_fkey1
 FOREIGN KEY (id_organizador) REFERENCES Organizador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Trabajar ADD CONSTRAINT trabajar_fkey2
 FOREIGN KEY (edicion) REFERENCES Evento(edicion)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Trabajar
 COMMENT ON TABLE Trabajar IS 'Tabla que relaciona a los organizadores con los eventos en los que trabajan';
@@ -913,11 +938,13 @@ CREATE TABLE Participar (
 -- Referencial
 ALTER TABLE Participar ADD CONSTRAINT participar_fkey1
 FOREIGN KEY (id_persona) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Participar ADD CONSTRAINT participar_fkey2
 FOREIGN KEY (id_torneo) REFERENCES Torneo(id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Participar
 COMMENT ON TABLE Participar IS 'Tabla que relaciona a los participantes con los torneos en los que participan';
@@ -947,11 +974,13 @@ ALTER TABLE Comprar ALTER COLUMN cantidad SET NOT NULL;
 -- Referencial
 ALTER TABLE Comprar ADD CONSTRAINT comprar_fkey1
 FOREIGN KEY (id_persona) REFERENCES Persona(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Comprar ADD CONSTRAINT comprar_fkey2
 FOREIGN KEY (id_alimento) REFERENCES Alimento(id_alimento)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Comprar
 COMMENT ON TABLE Comprar IS 'Tabla que registra las compras realizadas por personas sobre alimentos disponibles en el evento';
@@ -973,11 +1002,13 @@ CREATE TABLE Registrar (
 -- Referencial
 ALTER TABLE Registrar ADD CONSTRAINT registrar_fkey1
 FOREIGN KEY (id_persona_r) REFERENCES Registrador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Registrar ADD CONSTRAINT registrar_fkey2
 FOREIGN KEY (id_persona_p) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Registrar
 COMMENT ON TABLE Registrar IS 'Tabla que relaciona registradores con los participantes que registraron';
@@ -1004,11 +1035,13 @@ CHECK (hora_salida > hora_ingreso OR hora_salida IS NULL);
 -- Referencial
 ALTER TABLE Asistir ADD CONSTRAINT asistir_fkey1
 FOREIGN KEY (edicion) REFERENCES Evento(edicion)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Asistir ADD CONSTRAINT asistir_fkey2
 FOREIGN KEY (id_persona) REFERENCES Espectador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Asistir
 COMMENT ON TABLE Asistir IS 'Tabla que registra la asistencia de espectadores por edición, con horas de ingreso y salida';
@@ -1037,11 +1070,13 @@ ALTER TABLE Combatir ADD CONSTRAINT combatir_uk1 UNIQUE (id_combate, id_pokemon,
 -- Referencial
 ALTER TABLE Combatir ADD CONSTRAINT combatir_fkey1
 FOREIGN KEY (id_pokemon, codigo) REFERENCES Pokemon(id_pokemon, codigo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Combatir ADD CONSTRAINT combatir_fkey2
 FOREIGN KEY (id_combate, id_torneo) REFERENCES Combate(id_combate, id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Combatir
 COMMENT ON TABLE Combatir IS 'Tabla que relaciona pokémon con los combates en los que participan';
@@ -1062,11 +1097,13 @@ CREATE TABLE Ser (
 -- Referencial
 ALTER TABLE Ser ADD CONSTRAINT ser_fkey1
 FOREIGN KEY (id_persona_r) REFERENCES Registrador(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Ser ADD CONSTRAINT ser_fkey2
 FOREIGN KEY (id_persona_p) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Ser
 COMMENT ON TABLE Ser IS 'Tabla que relaciona registradores con participantes a los que sirven o registraron';
@@ -1093,11 +1130,13 @@ ALTER TABLE Enfrentar ALTER COLUMN id_persona SET NOT NULL;
 -- Referencial
 ALTER TABLE Enfrentar ADD CONSTRAINT enfrentar_fkey1
 FOREIGN KEY (id_combate, id_torneo) REFERENCES Combate(id_combate, id_torneo)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 ALTER TABLE Enfrentar ADD CONSTRAINT enfrentar_fkey2
 FOREIGN KEY (id_persona) REFERENCES Participante(id_persona)
-ON DELETE CASCADE;
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- COMENTARIOS Enfrentar
 COMMENT ON TABLE Enfrentar IS 'Tabla que indica qué participantes se enfrentan en cada combate y quién resultó ganador';
