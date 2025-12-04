@@ -19,20 +19,7 @@ INNER JOIN Pelea pel ON t.id_torneo = pel.id_torneo
 GROUP BY per.id_persona, per.nombres, per.apellido_paterno, per.apellido_materno, t.edicion
 ORDER BY t.edicion, nombre_participante;
 
--- ii. Participantes con más de 1 cuenta de Pokemon GO
-SELECT
-    p.id_persona,
-    CONCAT(per.nombres, ' ', per.apellido_paterno, ' ', per.apellido_materno) AS nombre_completo,
-    COUNT(c.codigo) AS num_cuentas,
-    STRING_AGG(c.username, ', ') AS usernames
-FROM Participante p
-JOIN Persona per ON p.id_persona = per.id_persona
-JOIN Cuenta c ON p.id_persona = c.id_persona
-GROUP BY p.id_persona, nombre_completo
-HAVING COUNT(c.codigo) > 1
-ORDER BY num_cuentas DESC, nombre_completo;
-
--- iii. Participantes con cuentas en más de un equipo
+-- ii. Participantes con cuentas en más de un equipo
 SELECT
     p.id_persona,
     CONCAT(per.nombres, ' ', per.apellido_paterno, ' ', per.apellido_materno) AS nombre,
@@ -45,6 +32,22 @@ GROUP BY p.id_persona, nombre
 HAVING COUNT(DISTINCT c.equipo) > 1
 ORDER BY equipos_distintos DESC;
 
+--- iii. Vendedor con su ubicación, el método de pago y los totales monetarios y de unidades vendidas
+select
+    CONCAT(per.nombres, ' ', per.apellido_paterno, ' ', per.apellido_materno) AS vendedor,
+    v.ubicacion,
+    cmp.metodo_pago,
+    SUM(cmp.cantidad) AS unidades_vendidas,
+    SUM(cmp.cantidad * a.precio) AS total_ingresos
+FROM Vendedor v
+JOIN Organizador org ON org.id_persona = v.id_persona
+JOIN Persona per ON per.id_persona = v.id_persona
+JOIN Alimento a ON a.id_persona = v.id_persona
+JOIN Comprar cmp ON cmp.id_alimento = a.id_alimento
+GROUP BY per.id_persona, v.ubicacion, cmp.metodo_pago
+HAVING SUM(cmp.cantidad * a.precio) > 200
+ORDER BY total_ingresos DESC, vendedor, metodo_pago;
+
 --  iv. Pokemon más utilizados en combates (por especie)
 SELECT
     pok.especie,
@@ -52,10 +55,9 @@ SELECT
 FROM Combatir cb
 JOIN Pokemon pok ON cb.id_pokemon = pok.id_pokemon AND cb.codigo = pok.codigo
 GROUP BY pok.especie
-ORDER BY veces_en_combates DESC
-LIMIT 20;
+ORDER BY veces_en_combates DESC;
 
--- v. Participantes con al menos 3 registros de distancia (proxy para haber pasado por 3 locaciones)
+-- v. Participantes con al menos 3 registros de distancia (haber pasado por las 3 locaciones)
 SELECT
     p.id_persona,
     CONCAT(per.nombres, ' ', per.apellido_paterno, ' ', per.apellido_materno) AS nombre,
@@ -67,6 +69,19 @@ JOIN Persona per ON p.id_persona = per.id_persona
 GROUP BY p.id_persona, nombre
 HAVING COUNT(*) >= 3
 ORDER BY distancia_total DESC;
+
+-- vi. Participantes con más de 1 cuenta de Pokemon GO
+SELECT
+    p.id_persona,
+    CONCAT(per.nombres, ' ', per.apellido_paterno, ' ', per.apellido_materno) AS nombre_completo,
+    COUNT(c.codigo) AS num_cuentas,
+    STRING_AGG(c.username, ', ') AS usernames
+FROM Participante p
+JOIN Persona per ON p.id_persona = per.id_persona
+JOIN Cuenta c ON p.id_persona = c.id_persona
+GROUP BY p.id_persona, nombre_completo
+HAVING COUNT(c.codigo) > 1
+ORDER BY num_cuentas DESC, nombre_completo;
 
 -- vii. Ganadores de cada torneo (por edición) y el premio
 SELECT
@@ -105,16 +120,35 @@ AND EXISTS (
 ORDER BY nombre;
 
 
--- ix. Edad promedio de espectadores por edición (usa Asistir)
+-- ix. Relaciona a compradores (participantes o espectadores) con los alimentos adquiridos, mostrando método, vendedor, precio unitario y gasto total por fila.
+WITH compras_agregadas AS (
+    SELECT
+        cmp.id_persona AS comprador,
+        cmp.id_alimento,
+        cmp.metodo_pago,
+        SUM(cmp.cantidad) AS unidades,
+        SUM(cmp.cantidad * a.precio) AS gasto_total
+    FROM Comprar cmp
+    JOIN Alimento a ON a.id_alimento = cmp.id_alimento
+    GROUP BY cmp.id_persona, cmp.id_alimento, cmp.metodo_pago
+    HAVING SUM(cmp.cantidad * a.precio) > 50
+)
 SELECT
-    a.edicion,
-    ROUND(AVG(date_part('year', age(current_date, per.fecha_de_nacimiento))), 2) AS edad_promedio_por_edicion,
-    COUNT(a.id_persona) AS asistentes_registrados
-FROM Asistir a
-JOIN Espectador esp ON a.id_persona = esp.id_persona
-JOIN Persona per ON esp.id_persona = per.id_persona
-GROUP BY a.edicion
-ORDER BY a.edicion;
+    ca.comprador,
+    CONCAT(per_comp.nombres, ' ', per_comp.apellido_paterno, ' ', per_comp.apellido_materno) AS nombre_comprador,
+    ca.metodo_pago,
+    ca.unidades,
+    ca.gasto_total,
+    a.nombre AS alimento,
+    a.precio AS precio_unitario,
+    CONCAT(per_vend.nombres, ' ', per_vend.apellido_paterno, ' ', per_vend.apellido_materno) AS vendedor,
+    v.ubicacion
+FROM compras_agregadas ca
+JOIN Alimento a ON a.id_alimento = ca.id_alimento
+JOIN Persona per_vend ON per_vend.id_persona = a.id_persona
+JOIN Vendedor v ON v.id_persona = a.id_persona
+JOIN Persona per_comp ON per_comp.id_persona = ca.comprador
+ORDER BY ca.gasto_total DESC, ca.comprador, a.nombre;
 
 -- x. Participantes por suma total de CP
 SELECT
@@ -172,18 +206,18 @@ WITH pok_por_participante AS (
     JOIN Torneo t ON pok.id_torneo = t.id_torneo
 )
 SELECT
-    ppp.id_persona,
+    p.id_persona,
     CONCAT(per.nombres,' ',per.apellido_paterno,' ',per.apellido_materno) AS nombre,
-    ppp.id_pokemon,
-    ppp.apodo,
-    ppp.especie,
-    ppp.puntos_combate,
-    ppp.id_torneo,
-    ppp.edicion
-FROM pok_por_participante ppp
-JOIN Persona per ON ppp.id_persona = per.id_persona
-WHERE ppp.rn = 1
-ORDER BY ppp.puntos_combate DESC;
+    p.id_pokemon,
+    p.apodo,
+    p.especie,
+    p.puntos_combate,
+    p.id_torneo,
+    p.edicion
+FROM pok_por_participante p
+JOIN Persona per ON p.id_persona = per.id_persona
+WHERE p.rn = 1
+ORDER BY p.puntos_combate DESC;
 
 -- xiii. Pokemon inscritos en torneo de pelea pero que no aparecen en ninguna fila de Combatir para ese torneo
 SELECT
@@ -199,37 +233,24 @@ LEFT JOIN Combatir cb ON pok.id_pokemon = cb.id_pokemon AND pok.codigo = cb.codi
 WHERE cb.id_pokemon IS NULL
 ORDER BY pok.id_torneo, pok.especie;
 
--- xiv. Top 10 organizadores por cantidad de ediciones trabajadas y rol predominante
-WITH roles AS (
-    SELECT o.id_persona,
-           SUM(CASE WHEN o.esRegistrador = TRUE THEN 1 ELSE 0 END) AS cnt_registrador,
-           SUM(CASE WHEN o.esCuidador = TRUE THEN 1 ELSE 0 END) AS cnt_cuidador,
-           SUM(CASE WHEN o.esLimpiador = TRUE THEN 1 ELSE 0 END) AS cnt_limpiador,
-           SUM(CASE WHEN o.esVendedor = TRUE THEN 1 ELSE 0 END) AS cnt_vendedor
-    FROM Organizador o
-    GROUP BY o.id_persona
-),
-ediciones AS (
-    SELECT tr.id_organizador, COUNT(DISTINCT tr.edicion) AS ediciones_trabajadas
-    FROM Trabajar tr
-    GROUP BY tr.id_organizador
-)
+-- xiv. Participantes que gastaron mas de 120 pesos y el número de metodos de pago utilizados.
 SELECT
-    e.id_organizador AS id_persona,
-    CONCAT(p.nombres,' ',p.apellido_paterno) AS nombre,
-    e.ediciones_trabajadas,
-    GREATEST(r.cnt_registrador, r.cnt_cuidador, r.cnt_limpiador, r.cnt_vendedor) AS rol_cnt_max,
-    CASE
-      WHEN r.cnt_registrador = GREATEST(r.cnt_registrador, r.cnt_cuidador, r.cnt_limpiador, r.cnt_vendedor) THEN 'Registrador'
-      WHEN r.cnt_cuidador = GREATEST(r.cnt_registrador, r.cnt_cuidador, r.cnt_limpiador, r.cnt_vendedor) THEN 'Cuidador'
-      WHEN r.cnt_limpiador = GREATEST(r.cnt_registrador, r.cnt_cuidador, r.cnt_limpiador, r.cnt_vendedor) THEN 'Limpiador'
-      ELSE 'Vendedor'
-    END AS rol_predominante
-FROM ediciones e
-LEFT JOIN roles r ON e.id_organizador = r.id_persona
-LEFT JOIN Persona p ON e.id_organizador = p.id_persona
-ORDER BY e.ediciones_trabajadas DESC
-LIMIT 10;
+    p.id_persona,
+    CONCAT(per.nombres, ' ', per.apellido_paterno, ' ', per.apellido_materno) AS nombre,
+    SUM(cmp.cantidad * a.precio) AS gasto_total,
+    COUNT(DISTINCT cmp.metodo_pago) AS metodos_distintos
+FROM Participante p
+JOIN Persona per ON per.id_persona = p.id_persona
+JOIN Comprar cmp ON cmp.id_persona = p.id_persona
+JOIN Alimento a ON a.id_alimento = cmp.id_alimento
+GROUP BY 
+    p.id_persona,
+    per.nombres,
+    per.apellido_paterno,
+    per.apellido_materno
+HAVING SUM(cmp.cantidad * a.precio) > 120
+ORDER BY gasto_total DESC;
+
 
 -- xv. Participantes con cuentas en un mismo equipo
 WITH equipos_por_persona AS (
