@@ -301,3 +301,40 @@ GROUP BY d.id_persona, per.nombres, per.apellido_paterno, per.apellido_materno
 ORDER BY distancia_total DESC;
 $$;
 
+-- Función: Calcula la recaudación de un evento basado en el número de participantes registrados (200 por cada uno) y el 75% de las ganancias de cada vendedeor
+CREATE OR REPLACE FUNCTION recaudar_por_evento(p_edicion INTEGER)
+RETURNS NUMERIC(14,2)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_participantes INTEGER;
+    v_recaudacion_participantes NUMERIC(14,2);
+    v_ventas_vendedores NUMERIC(14,2);
+    v_corte_vendedores NUMERIC(14,2);
+    v_total NUMERIC(14,2);
+BEGIN
+    -- Contar participantes distintos que participaron en torneos de la edición
+    SELECT COUNT(DISTINCT pa.id_persona)
+    INTO v_participantes
+    FROM Participar pa
+    JOIN Torneo t ON pa.id_torneo = t.id_torneo
+    WHERE t.edicion = p_edicion;
+
+    v_recaudacion_participantes := (v_participantes * 200)::NUMERIC(14,2);
+
+    -- Sumar ventas (precio * cantidad) de los alimentos cuyos vendedores trabajaron esa edición
+    -- Aplicar IVA (16%)
+    SELECT COALESCE(SUM(a.precio * c.cantidad * 1.16), 0)::NUMERIC(14,2)
+    INTO v_ventas_vendedores
+    FROM Comprar c
+    JOIN Alimento a ON c.id_alimento = a.id_alimento
+    JOIN Trabajar tr ON tr.id_organizador = a.id_persona AND tr.edicion = p_edicion;
+
+    -- 75% de las ganancias de cada vendedor (se toma 75% de la venta con IVA)
+    v_corte_vendedores := ROUND(v_ventas_vendedores * 0.75, 2);
+
+    v_total := ROUND(v_recaudacion_participantes + v_corte_vendedores, 2);
+
+    RETURN v_total;
+END;
+$$;
