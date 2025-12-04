@@ -2,7 +2,7 @@
 -- DISPARADORES PARA VALIDAR ROLES E INMUTABILIDAD
 -- ============================================
 
--- Función: validar roles en Persona y prohibir su modificación después de creada
+-- Disparador: validar roles en Persona y prohibir su modificación después de creada
 CREATE OR REPLACE FUNCTION persona_rol()
 RETURNS trigger AS $$
 BEGIN
@@ -26,7 +26,7 @@ BEFORE INSERT OR UPDATE ON Persona
 FOR EACH ROW EXECUTE FUNCTION persona_rol();
 
 
--- Función: validar roles en Personal y asegurar consistencia con Persona
+-- Disparador: validar roles en Personal y asegurar consistencia con Persona
 CREATE OR REPLACE FUNCTION personal_rol()
 RETURNS trigger AS $$
 DECLARE
@@ -60,7 +60,7 @@ BEFORE INSERT OR UPDATE ON Personal
 FOR EACH ROW EXECUTE FUNCTION personal_rol();
 
 
--- Función: validar roles en Organizador y asegurar consistencia con Personal
+-- Disparador: validar roles en Organizador y asegurar consistencia con Personal
 CREATE OR REPLACE FUNCTION organizador_rol()
 RETURNS trigger AS $$
 DECLARE
@@ -119,7 +119,7 @@ BEFORE INSERT ON Espectador
 FOR EACH ROW EXECUTE FUNCTION espectador_integridad();
 
 
--- Función: validar roles en Torneo y prohibir su modificación después de creada
+-- Disparador: validar roles en Torneo y prohibir su modificación después de creada
 CREATE OR REPLACE FUNCTION torneo_rol()
 RETURNS trigger AS $$
 BEGIN
@@ -144,7 +144,7 @@ BEFORE INSERT OR UPDATE ON Torneo
 FOR EACH ROW EXECUTE FUNCTION torneo_rol();
 
 
--- Función: validar roles en Multi y asegurar coherencia con Torneo
+-- Disparador: validar roles en Multi y asegurar coherencia con Torneo
 CREATE OR REPLACE FUNCTION multi_rol()
 RETURNS trigger AS $$
 DECLARE
@@ -179,7 +179,7 @@ CREATE TRIGGER multi_roles
 BEFORE INSERT OR UPDATE ON Multi
 FOR EACH ROW EXECUTE FUNCTION multi_rol();
 
--- Función: validar consistencia de Pelea con Torneo (solo insertar si Torneo.esPelea = TRUE)
+-- Disparador: validar consistencia de Pelea con Torneo (solo insertar si Torneo.esPelea = TRUE)
 CREATE OR REPLACE FUNCTION pelea_integridad()
 RETURNS trigger AS $$
 DECLARE
@@ -199,3 +199,142 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER pelea_integridad_trg
 BEFORE INSERT ON Pelea
 FOR EACH ROW EXECUTE FUNCTION pelea_integridad();
+
+-- ============================================
+-- FUNCIONES PARA ATRIBUTOS CALCULADOS
+-- ============================================
+
+--- Función: Contar el número de regitsors que realizó un registrador
+--- Entrada: id_registrador
+CREATE OR REPLACE FUNCTION contar_registros_registrador(p_registrador INTEGER)
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM Registrar
+    WHERE id_persona_r = p_registrador;
+
+    RETURN COALESCE(v_count, 0);
+END;
+$$;
+
+--- Función: Calcular el sueldo de un registrador (sueldo base + 50*canntidad de registros realizados)
+--- Entrada: id_registrador
+CREATE OR REPLACE FUNCTION calcular_salario_registrador(p_registrador INTEGER)
+RETURNS NUMERIC(12,2)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_base NUMERIC(12,2);
+    v_cnt  INTEGER;
+BEGIN
+    SELECT salario_base INTO v_base
+    FROM Registrador
+    WHERE id_persona = p_registrador;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No existe registrador con id %', p_registrador;
+    END IF;
+
+    SELECT COUNT(*) INTO v_cnt
+    FROM Registrar
+    WHERE id_persona_r = p_registrador;
+
+    RETURN ROUND(v_base + (v_cnt * 50)::NUMERIC, 2);
+END;
+$$;
+
+--- Función para calcular el precio final de un alimento
+--- Entrada: id_alimento
+CREATE OR REPLACE FUNCTION precio_final_alimento(p_id_alimento INTEGER)
+RETURNS TABLE(
+    id_alimento INTEGER,
+    precio_base NUMERIC(10,2),
+    iva NUMERIC(10,2),
+    precio_final NUMERIC(10,2)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_precio NUMERIC(10,2);
+BEGIN
+    SELECT precio INTO v_precio
+    FROM Alimento
+    WHERE id_alimento = p_id_alimento;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No existe alimento con id %', p_id_alimento;
+    END IF;
+
+    RETURN QUERY
+    SELECT p_id_alimento,
+           v_precio,
+           ROUND(v_precio * 0.16, 2) AS iva,
+           ROUND(v_precio * 1.16, 2) AS precio_final;
+END;
+$$;
+
+--- Función para calcular la distancia total de un participante en un solo torneo de distancia recorrida
+--- id_persona (Del participante)
+CREATE OR REPLACE FUNCTION distancia_total_por_edicion(p_edicion INTEGER)
+RETURNS TABLE(
+    id_participante INTEGER,
+    nombre_participante TEXT,
+    distancia_total NUMERIC(14,2)
+)
+LANGUAGE sql
+AS $$
+SELECT d.id_persona,
+       COALESCE(per.nombres,'') || ' ' || COALESCE(per.apellido_paterno,'') || ' ' || COALESCE(per.apellido_materno,'') AS nombre_participante,
+       SUM(d.distancia)::NUMERIC(14,2) AS distancia_total
+FROM Distancia d
+JOIN Participante par ON par.id_persona = d.id_persona
+JOIN Torneo t ON par.id_torneo = t.id_torneo
+JOIN Multi m ON t.id_torneo = m.id_torneo
+LEFT JOIN Persona per ON per.id_persona = d.id_persona
+WHERE t.edicion = $1
+  AND m.esDistanciaRecorrida = TRUE
+GROUP BY d.id_persona, per.nombres, per.apellido_paterno, per.apellido_materno
+ORDER BY distancia_total DESC;
+$$;
+
+-- Función: Calcula la recaudación de un evento basado en el número de participantes registrados (200 por cada uno) y el 75% de las ganancias de cada vendedeor
+CREATE OR REPLACE FUNCTION recaudar_por_evento(p_edicion INTEGER)
+RETURNS NUMERIC(14,2)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_participantes INTEGER;
+    v_recaudacion_participantes NUMERIC(14,2);
+    v_ventas_vendedores NUMERIC(14,2);
+    v_corte_vendedores NUMERIC(14,2);
+    v_total NUMERIC(14,2);
+BEGIN
+    -- Contar participantes distintos que participaron en torneos de la edición
+    SELECT COUNT(DISTINCT pa.id_persona)
+    INTO v_participantes
+    FROM Participar pa
+    JOIN Torneo t ON pa.id_torneo = t.id_torneo
+    WHERE t.edicion = p_edicion;
+
+    v_recaudacion_participantes := (v_participantes * 200)::NUMERIC(14,2);
+
+    -- Sumar ventas (precio * cantidad) de los alimentos cuyos vendedores trabajaron esa edición
+    -- Aplicar IVA (16%)
+    SELECT COALESCE(SUM(a.precio * c.cantidad * 1.16), 0)::NUMERIC(14,2)
+    INTO v_ventas_vendedores
+    FROM Comprar c
+    JOIN Alimento a ON c.id_alimento = a.id_alimento
+    JOIN Trabajar tr ON tr.id_organizador = a.id_persona AND tr.edicion = p_edicion;
+
+    -- 75% de las ganancias de cada vendedor (se toma 75% de la venta con IVA)
+    v_corte_vendedores := ROUND(v_ventas_vendedores * 0.75, 2);
+
+    v_total := ROUND(v_recaudacion_participantes + v_corte_vendedores, 2);
+
+    RETURN v_total;
+END;
+$$;
